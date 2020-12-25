@@ -1,7 +1,7 @@
 package fr.stazi.epsi.spring.boot.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import fr.stazi.epsi.spring.boot.entity.user.User;
@@ -13,17 +13,16 @@ public class SecurityMethodsService {
 	@Autowired
 	private UserRepository userRepository;
 
-	public boolean canManage(Long cellId, User userId) {
-		//User user = userRepository.findByUsername(principal.toString)
-		User user = userRepository.findById(userId).orElse(null);		
+	public boolean canManage(org.springframework.security.core.userdetails.User principal, Long cellId) {
+		User user = userRepository.findByUsername(principal.getUsername())
+				.orElseThrow(() -> new UsernameNotFoundException(principal.getUsername()));
+
 		for (Cell cell : user.getCells()) {
-			if (cell.getId().equals(cellId)) 
+			if (cell.getId().equals(cellId))
 				return true;
 		}
 		return false;
-		
+
 	}
 
 }
-
-
